@@ -29,7 +29,11 @@ func RunGame() {
 			playerCount = int(count)
 		}
 	}
-	window, renderer = sdl.CreateWindowAndRenderer(800, 600, 0)
+	var err error
+	window, renderer, err = sdl.CreateWindowAndRenderer(800, 600, 0)
+	if err != nil {
+		panic(err)
+	}
 	defer window.Destroy()
 	defer renderer.Destroy()
 	ttf.Init()
