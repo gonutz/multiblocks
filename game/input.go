@@ -1,5 +1,6 @@
 package game
 
+// InputEvent abstracts the button presses of players.
 type InputEvent struct {
 	Player  int
 	Command Command

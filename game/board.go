@@ -1,5 +1,7 @@
 package game
 
+// board encodes the game field, a rectangular area where solid block pieces are
+// stored.
 type board [][]int
 
 func newBoard(w, h int) board {
@@ -32,6 +34,8 @@ func (b board) SetAt(x, y, setTo int) {
 	b[y][x] = setTo
 }
 
+// Copy creates a new board copying the original arrays so that changing the
+// copy does not change the orignial.
 func (b board) Copy() Board {
 	c := make([][]int, len(b))
 	for i := range c {
