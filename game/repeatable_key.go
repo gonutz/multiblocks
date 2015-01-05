@@ -37,3 +37,7 @@ func (k *repeatableKey) Update() (triggering bool) {
 func (k *repeatableKey) IsDown() bool {
 	return k.down
 }
+
+func (k *repeatableKey) Blocked() {
+	k.timer = 0
+}

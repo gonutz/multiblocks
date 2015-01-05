@@ -427,7 +427,7 @@ func TestLinesAboveBoardCanNotBeFull(t *testing.T) {
 func TestRightKeyIsRepeatedWhileNotReleased(t *testing.T) {
 	logic := createSingleBlockGame(1, BoardSize{6, 1}, []Point{{0, 0}})
 	logic.SetInitialLeftRightKeyDelay(3)
-	logic.SetFastLeftRightKeyDelay(2)
+	logic.SetShortLeftRightKeyDelay(2)
 	logic.StartNewGame(1)
 	checkGame(t, logic, "initial",
 		"0.....",
@@ -476,7 +476,7 @@ func TestRightKeyIsRepeatedWhileNotReleased(t *testing.T) {
 func TestPressingRightAgainWhileAlreadyDownDoesNotMoveAgain(t *testing.T) {
 	logic := createSingleBlockGame(1, BoardSize{6, 1}, []Point{{0, 0}})
 	logic.SetInitialLeftRightKeyDelay(3)
-	logic.SetFastLeftRightKeyDelay(2)
+	logic.SetShortLeftRightKeyDelay(2)
 	logic.StartNewGame(1)
 	checkGame(t, logic, "initial",
 		"0.....",
@@ -503,7 +503,7 @@ func TestPressingRightAgainWhileAlreadyDownDoesNotMoveAgain(t *testing.T) {
 func TestAllPlayersAreRightRepeated(t *testing.T) {
 	logic := createSingleBlockGame(2, BoardSize{6, 1}, []Point{{0, 0}, {1, 0}})
 	logic.SetInitialLeftRightKeyDelay(0)
-	logic.SetFastLeftRightKeyDelay(0)
+	logic.SetShortLeftRightKeyDelay(0)
 	logic.StartNewGame(2)
 	checkGame(t, logic, "initial",
 		"01....",
@@ -526,7 +526,7 @@ func TestAllPlayersAreRightRepeated(t *testing.T) {
 func TestLeftKeyIsRepeated(t *testing.T) {
 	logic := createSingleBlockGame(2, BoardSize{6, 1}, []Point{{5, 0}, {4, 0}})
 	logic.SetInitialLeftRightKeyDelay(3)
-	logic.SetFastLeftRightKeyDelay(2)
+	logic.SetShortLeftRightKeyDelay(2)
 	logic.StartNewGame(2)
 	checkGame(t, logic, "initial",
 		"....10",
@@ -559,7 +559,7 @@ func TestLeftKeyIsRepeated(t *testing.T) {
 func TestDownKeyIsRepeated(t *testing.T) {
 	logic := createSingleBlockGame(2, BoardSize{1, 5}, []Point{{0, 4}, {0, 3}})
 	logic.SetInitialDownKeyDelay(3)
-	logic.SetFastDownKeyDelay(2)
+	logic.SetShortDownKeyDelay(2)
 	logic.StartNewGame(2)
 	checkGame(t, logic, "initial",
 		"0",
@@ -617,8 +617,8 @@ func TestKeyReleaseEventsAreHandledEvenWhenAnimationIsRunning(t *testing.T) {
 	logic := createSingleBlockGame(2, BoardSize{8, 3}, []Point{{0, 2}, {7, 0}})
 	logic.SetInitialLeftRightKeyDelay(0)
 	logic.SetInitialDownKeyDelay(0)
-	logic.SetFastLeftRightKeyDelay(0)
-	logic.SetFastDownKeyDelay(0)
+	logic.SetShortLeftRightKeyDelay(0)
+	logic.SetShortDownKeyDelay(0)
 	animation := &spyLineAnimation{running: false}
 	logic.SetLineAnimation(animation)
 	logic.StartNewGame(2)
@@ -687,8 +687,8 @@ func TestDownKeyRepeatRateMayDifferFromHorizontalOne(t *testing.T) {
 	logic := createSingleBlockGame(1, BoardSize{5, 4}, []Point{{0, 3}})
 	logic.SetInitialDownKeyDelay(3)
 	logic.SetInitialLeftRightKeyDelay(2)
-	logic.SetFastDownKeyDelay(1)
-	logic.SetFastLeftRightKeyDelay(0)
+	logic.SetShortDownKeyDelay(1)
+	logic.SetShortLeftRightKeyDelay(0)
 	logic.StartNewGame(1)
 	logic.Update(InputEvent{0, DownPressed}, InputEvent{0, RightPressed})
 	checkGame(t, logic, "initial",
@@ -762,7 +762,7 @@ func TestWhileDownKeyPressed_BlocksAreNotDroppedOnTimer(t *testing.T) {
 func TestAfterBlockResetTheDownKeyIsReleasedAutomatically(t *testing.T) {
 	logic := createSingleBlockGame(1, BoardSize{2, 3}, []Point{{0, 2}})
 	logic.SetInitialDownKeyDelay(0)
-	logic.SetFastDownKeyDelay(0)
+	logic.SetShortDownKeyDelay(0)
 	logic.StartNewGame(1)
 	checkGame(t, logic, "initial",
 		"0.",
@@ -803,7 +803,32 @@ func TestSoundPlayerIsAddedAsBlockObserver(t *testing.T) {
 	}
 }
 
-func TestInKeyRepeatMode_MovesRightAfterBlocked(t *testing.T) {
+func TestHoldingRightMovesAsSoonAsNotBlockedAnymore(t *testing.T) {
+	logic := createSingleBlockGame(1, BoardSize{3, 2}, []Point{{0, 1}})
+	logic.SetInitialLeftRightKeyDelay(100)
+	logic.SetShortLeftRightKeyDelay(0)
+	logic.StartNewGame(1)
+	logic.Board().SetAt(1, 1, 0)
+	logic.Board().SetAt(2, 1, 0)
+	logic.Update(InputEvent{0, RightPressed})
+	checkGame(t, logic, "blocked right",
+		"000",
+		"...",
+	)
+	logic.Update(InputEvent{0, DownPressed}, InputEvent{0, DownReleased})
+	logic.Update()
+	checkGame(t, logic, "moved right after blocked",
+		".00",
+		".0.",
+	)
+	logic.Update()
+	checkGame(t, logic, "continue with fast delay",
+		".00",
+		"..0",
+	)
+}
+
+func TestAdjacentBlocksAreFollowedIfHoldingRightDown(t *testing.T) {
 	// TODO find a better name for this test (more descriptive)
 	// if a block is moving right repeatedly and another block is in its way
 	// than whenever that block moves the one behind it should move as well.

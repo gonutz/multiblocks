@@ -51,20 +51,23 @@ func (p *physics) MoveLeft(block int) {
 	p.moveBlockX(block, -1)
 }
 
-func (p *physics) MoveRight(block int) {
-	p.moveBlockX(block, 1)
+func (p *physics) MoveRight(block int) bool {
+	return p.moveBlockX(block, 1)
 }
 
-func (p *physics) moveBlockX(block, dx int) {
+func (p *physics) moveBlockX(block, dx int) bool {
 	p.blocks[block].MoveBy(dx, 0)
 	if p.isInWall(block) || p.isInSolidPartOfBoard(block) {
 		p.blocks[block].MoveBy(-dx, 0)
 		p.notifyOfLeftRightHit(block)
+		return false
 	} else if p.isInOtherBlock(block) {
 		p.blocks[block].MoveBy(-dx, 0)
 		p.notifyOfBlockHit(block)
+		return false
 	} else {
 		p.notifyOfHorizontalMove(block)
+		return true
 	}
 }
 
