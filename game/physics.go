@@ -47,8 +47,8 @@ func (p *physics) SetBlock(index int, block Block) {
 	p.blocks[index] = block
 }
 
-func (p *physics) MoveLeft(block int) {
-	p.moveBlockX(block, -1)
+func (p *physics) MoveLeft(block int) bool {
+	return p.moveBlockX(block, -1)
 }
 
 func (p *physics) MoveRight(block int) bool {

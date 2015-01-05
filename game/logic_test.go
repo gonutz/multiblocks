@@ -828,6 +828,31 @@ func TestHoldingRightMovesAsSoonAsNotBlockedAnymore(t *testing.T) {
 	)
 }
 
+func TestHoldingLeftMovesAsSoonAsNotBlockedAnymore(t *testing.T) {
+	logic := createSingleBlockGame(1, BoardSize{3, 2}, []Point{{2, 1}})
+	logic.SetInitialLeftRightKeyDelay(100)
+	logic.SetShortLeftRightKeyDelay(0)
+	logic.StartNewGame(1)
+	logic.Board().SetAt(0, 1, 0)
+	logic.Board().SetAt(1, 1, 0)
+	logic.Update(InputEvent{0, LeftPressed})
+	checkGame(t, logic, "blocked left",
+		"000",
+		"...",
+	)
+	logic.Update(InputEvent{0, DownPressed}, InputEvent{0, DownReleased})
+	logic.Update()
+	checkGame(t, logic, "moved left after blocked",
+		"00.",
+		".0.",
+	)
+	logic.Update()
+	checkGame(t, logic, "continue with fast delay",
+		"00.",
+		"0..",
+	)
+}
+
 func TestAdjacentBlocksAreFollowedIfHoldingRightDown(t *testing.T) {
 	// TODO find a better name for this test (more descriptive)
 	// if a block is moving right repeatedly and another block is in its way

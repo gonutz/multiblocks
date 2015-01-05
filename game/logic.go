@@ -238,7 +238,9 @@ func (l *Logic) handleInputEvents(events ...InputEvent) {
 
 			case LeftPressed:
 				if !l.hasDroppedThisFrame[e.Player] && l.leftKeys[e.Player].Press() {
-					l.physics.MoveLeft(e.Player)
+					if !l.physics.MoveLeft(e.Player) {
+						l.leftKeys[e.Player].Blocked()
+					}
 				}
 			case LeftReleased:
 				l.leftKeys[e.Player].Release()
