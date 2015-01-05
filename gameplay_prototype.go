@@ -22,7 +22,7 @@ const blockSize = 20
 func RunGame() {
 	sdl.Init(sdl.INIT_EVERYTHING)
 	defer sdl.Quit()
-	playerCount = 2
+	playerCount = 1
 	if len(os.Args) == 2 {
 		count, err := strconv.ParseInt(os.Args[1], 10, 32)
 		if err == nil {
@@ -54,9 +54,9 @@ func RunGame() {
 	g.SetDropTimer(&dropTimer{})
 	g.SetLineAnimation(animation)
 	g.SetInitialLeftRightKeyDelay(9)
-	g.SetFastLeftRightKeyDelay(2)
+	g.SetShortLeftRightKeyDelay(2)
 	g.SetInitialDownKeyDelay(2)
-	g.SetFastDownKeyDelay(1)
+	g.SetShortDownKeyDelay(1)
 	g.SetScorer(scorer)
 	g.SetSoundPlayer(game.NewSoundPlayer(sounds))
 	g.StartNewGame(playerCount)
@@ -170,6 +170,8 @@ func initKeys() {
 		sdl.K_RIGHT: game.InputEvent{0, game.RightPressed},
 		sdl.K_DOWN:  game.InputEvent{0, game.DownPressed},
 		sdl.K_UP:    game.InputEvent{0, game.RotateRight},
+		sdl.K_y:     game.InputEvent{0, game.RotateLeft},
+		sdl.K_x:     game.InputEvent{0, game.RotateRight},
 		sdl.K_a:     game.InputEvent{1, game.LeftPressed},
 		sdl.K_d:     game.InputEvent{1, game.RightPressed},
 		sdl.K_s:     game.InputEvent{1, game.DownPressed},

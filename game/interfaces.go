@@ -7,10 +7,14 @@ type Board interface {
 	SetAt(x, y, setTo int)
 }
 
+// NoPlayer is used in a Board to signal that a spot is empty.
 const NoPlayer = -1
 
 type BlockFactory func() Block
 
+// DropTimer tells the game logic when it is time to drop all blocks at the same
+// time. This usually happens regularly and with higher frequency the higher the
+// difficulty.
 type DropTimer interface {
 	Reset()
 	Update()

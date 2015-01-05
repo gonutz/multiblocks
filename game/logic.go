@@ -16,8 +16,8 @@ type Logic struct {
 	downKeys              []*repeatableKey
 	initialLeftRightDelay int
 	initialDownDelay      int
-	fastLeftRightDelay    int
-	fastDownDelay         int
+	shortLeftRightDelay   int
+	shortDownDelay        int
 	scorer                Scorer
 	soundPlayer           GameSoundPlayer
 }
@@ -50,20 +50,22 @@ func (l *Logic) SetBlockStartPositions(players int, start []Point) {
 	l.startPositions[players] = start
 }
 
+// Setting key delays to 0 means that the key is repeated on every update.
+// Setting it to 1 means 1 update between repeats, and so on.
 func (l *Logic) SetInitialLeftRightKeyDelay(delay int) {
 	l.initialLeftRightDelay = delay
 }
 
-func (l *Logic) SetFastLeftRightKeyDelay(delay int) {
-	l.fastLeftRightDelay = delay
+func (l *Logic) SetShortLeftRightKeyDelay(delay int) {
+	l.shortLeftRightDelay = delay
 }
 
 func (l *Logic) SetInitialDownKeyDelay(delay int) {
 	l.initialDownDelay = delay
 }
 
-func (l *Logic) SetFastDownKeyDelay(delay int) {
-	l.fastDownDelay = delay
+func (l *Logic) SetShortDownKeyDelay(delay int) {
+	l.shortDownDelay = delay
 }
 
 func (l *Logic) StartNewGame(players int) {
@@ -93,9 +95,9 @@ func (l *Logic) createBlocks() {
 }
 
 func (l *Logic) createRepeatableKeys() {
-	l.leftKeys = l.makeKeys(l.initialLeftRightDelay, l.fastLeftRightDelay)
-	l.rightKeys = l.makeKeys(l.initialLeftRightDelay, l.fastLeftRightDelay)
-	l.downKeys = l.makeKeys(l.initialDownDelay, l.fastDownDelay)
+	l.leftKeys = l.makeKeys(l.initialLeftRightDelay, l.shortLeftRightDelay)
+	l.rightKeys = l.makeKeys(l.initialLeftRightDelay, l.shortLeftRightDelay)
+	l.downKeys = l.makeKeys(l.initialDownDelay, l.shortDownDelay)
 }
 
 func (l *Logic) makeKeys(initialDelay, fastDelay int) []*repeatableKey {
@@ -236,14 +238,18 @@ func (l *Logic) handleInputEvents(events ...InputEvent) {
 
 			case LeftPressed:
 				if !l.hasDroppedThisFrame[e.Player] && l.leftKeys[e.Player].Press() {
-					l.physics.MoveLeft(e.Player)
+					if !l.physics.MoveLeft(e.Player) {
+						l.leftKeys[e.Player].Blocked()
+					}
 				}
 			case LeftReleased:
 				l.leftKeys[e.Player].Release()
 
 			case RightPressed:
 				if !l.hasDroppedThisFrame[e.Player] && l.rightKeys[e.Player].Press() {
-					l.physics.MoveRight(e.Player)
+					if !l.physics.MoveRight(e.Player) {
+						l.rightKeys[e.Player].Blocked()
+					}
 				}
 			case RightReleased:
 				l.rightKeys[e.Player].Release()
