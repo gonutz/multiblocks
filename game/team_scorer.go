@@ -26,7 +26,37 @@ func (s *TeamScorer) ScoreForTeam(team int) int {
 }
 
 func (s *TeamScorer) LinesRemoved(linesForPlayer [][]int) {
-	for player, lines := range linesForPlayer {
-		s.teamScores[s.playerToTeam[player]] += lineScores[len(lines)]
+	teamLines := s.assembleLinesForAllTeamsOfAllPlayers(linesForPlayer)
+	for team, lines := range teamLines {
+		lineCount := countDistinct(lines)
+		s.teamScores[team] += lineScores[lineCount]
 	}
+}
+
+func (s *TeamScorer) assembleLinesForAllTeamsOfAllPlayers(linesForPlayer [][]int) [4][]int {
+	var teamLines [4][]int
+	for player, lines := range linesForPlayer {
+		team := s.playerToTeam[player]
+		teamLines[team] = append(teamLines[team], lines...)
+	}
+	return teamLines
+}
+
+func countDistinct(lines []int) int {
+	count := 0
+	for i, line := range lines {
+		if !contains(lines[:i], line) {
+			count++
+		}
+	}
+	return count
+}
+
+func contains(lines []int, line int) bool {
+	for _, l := range lines {
+		if l == line {
+			return true
+		}
+	}
+	return false
 }

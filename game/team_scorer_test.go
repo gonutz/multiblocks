@@ -32,7 +32,7 @@ func TestEachTeamIsScoredByItsRemovedLines(t *testing.T) {
 	}
 }
 
-func TestTeamScoresIncreaseWithRemovedLines(t *testing.T) {
+func TestTeamScoresAddUpWithRemovedLines(t *testing.T) {
 	s := NewTeamScorer()
 	s.AssignPlayerToTeam(0, 0)
 	s.LinesRemoved([][]int{{1}})
@@ -40,5 +40,31 @@ func TestTeamScoresIncreaseWithRemovedLines(t *testing.T) {
 	expected := lineScores[1] + lineScores[3]
 	if score := s.ScoreForTeam(0); score != expected {
 		t.Errorf("expected %v but score was %v", expected, score)
+	}
+}
+
+func TestLinesForAllPlayersInATeamAreAddedForScore(t *testing.T) {
+	s := NewTeamScorer()
+	s.AssignPlayerToTeam(0, 0)
+	s.AssignPlayerToTeam(1, 0)
+	s.LinesRemoved([][]int{
+		{1, 2},
+		{3},
+	})
+	if score := s.ScoreForTeam(0); score != lineScores[3] {
+		t.Errorf("expected %v but score was %v", lineScores[3], score)
+	}
+}
+
+func TestTwoPlayers_OnSameTeam_RemovingSameLine_CountsOnlyOne(t *testing.T) {
+	s := NewTeamScorer()
+	s.AssignPlayerToTeam(0, 0)
+	s.AssignPlayerToTeam(1, 0)
+	s.LinesRemoved([][]int{
+		{1, 2, 3},
+		{1, 3, 5},
+	})
+	if score := s.ScoreForTeam(0); score != lineScores[4] {
+		t.Errorf("expected %v but score was %v", lineScores[4], score)
 	}
 }
