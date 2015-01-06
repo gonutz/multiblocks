@@ -68,3 +68,13 @@ func TestTwoPlayers_OnSameTeam_RemovingSameLine_CountsOnlyOne(t *testing.T) {
 		t.Errorf("expected %v but score was %v", lineScores[4], score)
 	}
 }
+
+func TestResettingSetsAllScoresToZero(t *testing.T) {
+	s := NewTeamScorer()
+	s.AssignPlayerToTeam(0, 0)
+	s.LinesRemoved([][]int{{1, 2, 3}})
+	s.Reset()
+	if score := s.ScoreForTeam(0); score != 0 {
+		t.Errorf("expected 0 but score was %v", score)
+	}
+}

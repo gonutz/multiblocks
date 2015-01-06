@@ -60,3 +60,9 @@ func contains(lines []int, line int) bool {
 	}
 	return false
 }
+
+func (s *TeamScorer) Reset() {
+	for i := range s.teamScores {
+		s.teamScores[i] = 0
+	}
+}

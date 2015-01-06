@@ -22,7 +22,7 @@ const blockSize = 20
 func RunGame() {
 	sdl.Init(sdl.INIT_EVERYTHING)
 	defer sdl.Quit()
-	playerCount = 1
+	playerCount = 2
 	if len(os.Args) == 2 {
 		count, err := strconv.ParseInt(os.Args[1], 10, 32)
 		if err == nil {
@@ -85,7 +85,7 @@ func RunGame() {
 					running = false
 				case sdl.K_n:
 					g.StartNewGame(playerCount)
-					scorer.reset()
+					scorer.Reset()
 				}
 
 				input, ok := keyUpMap[event.Keysym.Sym]
@@ -235,46 +235,25 @@ func randomBlock() game.Block {
 }
 
 func initScorer() {
-	linesToScoreMap := []int{0, 2, 5, 15, 60}
-	scorer = &perPlayerScorer{
-		make([]int, playerCount),
-		make([]int, playerCount),
-		linesToScoreMap,
+	scorer = game.NewTeamScorer()
+	for i := 0; i < playerCount; i++ {
+		scorer.AssignPlayerToTeam(i, i)
 	}
 }
 
-var scorer *perPlayerScorer
+var scorer *game.TeamScorer
 
-type perPlayerScorer struct {
-	lines           []int
-	scores          []int
-	linesToScoreMap []int
-}
-
-func (s *perPlayerScorer) LinesRemoved(linesForPlayer [][]int) {
-	for p := 0; p < playerCount; p++ {
-		lineCount := len(linesForPlayer[p])
-		s.lines[p] += lineCount
-		s.scores[p] += s.linesToScoreMap[lineCount]
-	}
-}
-
-func (s *perPlayerScorer) draw() {
+func drawScore() {
 	_, boardH := animation.board.Size()
-	for p, s := range s.scores {
-		y := (p + 1 + boardH) * blockSize
-		c := dark(p)
+	for t := 0; t < 4; t++ {
+		s := scorer.ScoreForTeam(t)
+		y := (t + 1 + boardH) * blockSize
+		c := dark(t)
 		renderer.SetDrawColor(c[0], c[1], c[2], 255)
 		for x := 0; x < s; x++ {
 			drawX := x + 10 + x*2
 			renderer.DrawLine(drawX, y, drawX, y+blockSize*2/3)
 		}
-	}
-}
-
-func (s *perPlayerScorer) reset() {
-	for i := range s.scores {
-		s.scores[i] = 0
 	}
 }
 
@@ -306,7 +285,7 @@ func draw(g *game.Logic) {
 	}
 
 	animation.draw()
-	scorer.draw()
+	drawScore()
 
 	renderer.Present()
 }
