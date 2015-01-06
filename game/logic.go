@@ -145,7 +145,7 @@ func (l *Logic) giveScoresForFullLines() {
 	if l.scorer != nil {
 		lines := make([][]int, l.playerCount)
 		l.fillWithPlayerToLineInfo(lines)
-		l.scorer.LinesRemoved(&playerToLines{lines})
+		l.scorer.LinesRemoved(lines)
 	}
 }
 

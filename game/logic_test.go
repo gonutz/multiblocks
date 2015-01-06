@@ -665,21 +665,18 @@ func TestRemovedLinesAreGivenToScorer(t *testing.T) {
 		"01",
 		"00",
 	)
-	checkIntsEqual(t, spy.lines.LinesForPlayer(0), []int{},
-		"no lines removed yet")
-	checkIntsEqual(t, spy.lines.LinesForPlayer(1), []int{},
-		"no lines removed yet")
+	checkIntsEqual(t, spy.lines[0], []int{}, "no lines removed yet")
+	checkIntsEqual(t, spy.lines[1], []int{}, "no lines removed yet")
 
 	logic.Update()
-	checkIntsEqual(t, spy.lines.LinesForPlayer(0), []int{0, 1},
+	checkIntsEqual(t, spy.lines[0], []int{0, 1},
 		"lines 0 and 1 expected full for player 0")
-	checkIntsEqual(t, spy.lines.LinesForPlayer(1), []int{1},
-		"line 1 expected full for player 1")
+	checkIntsEqual(t, spy.lines[1], []int{1}, "line 1 expected full for player 1")
 
 	logic.Update()
-	checkIntsEqual(t, spy.lines.LinesForPlayer(0), []int{},
+	checkIntsEqual(t, spy.lines[0], []int{},
 		"this frame no lines are full for player 0")
-	checkIntsEqual(t, spy.lines.LinesForPlayer(1), []int{},
+	checkIntsEqual(t, spy.lines[1], []int{},
 		"this frame no lines are full for player 1")
 }
 
@@ -998,10 +995,10 @@ func (s *spyLineAnimation) Update()         { s.updated++ }
 func (s *spyLineAnimation) IsRunning() bool { return s.running }
 
 type spyScorer struct {
-	lines PlayersToLines
+	lines [][]int
 }
 
-func (s *spyScorer) LinesRemoved(lines PlayersToLines) { s.lines = lines }
+func (s *spyScorer) LinesRemoved(lines [][]int) { s.lines = lines }
 
 type spySoundPlayer struct {
 	spyCollisionObserver

@@ -251,9 +251,9 @@ type perPlayerScorer struct {
 	linesToScoreMap []int
 }
 
-func (s *perPlayerScorer) LinesRemoved(lines game.PlayersToLines) {
+func (s *perPlayerScorer) LinesRemoved(linesForPlayer [][]int) {
 	for p := 0; p < playerCount; p++ {
-		lineCount := len(lines.LinesForPlayer(p))
+		lineCount := len(linesForPlayer[p])
 		s.lines[p] += lineCount
 		s.scores[p] += s.linesToScoreMap[lineCount]
 	}

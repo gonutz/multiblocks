@@ -47,10 +47,6 @@ type LineAnimation interface {
 	IsRunning() bool
 }
 
-type PlayersToLines interface {
-	LinesForPlayer(p int) []int
-}
-
 type Scorer interface {
-	LinesRemoved(lines PlayersToLines)
+	LinesRemoved(linesForPlayer [][]int)
 }
