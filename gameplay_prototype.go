@@ -393,21 +393,22 @@ type gameSounds struct {
 }
 
 func (s *gameSounds) init() {
-	if !mix.OpenAudio(44100, mix.DEFAULT_FORMAT, 2, 1024) {
-		panic("could not open audio")
+	if err := mix.OpenAudio(44100, mix.DEFAULT_FORMAT, 2, 1024); err != nil {
+		panic(err)
 	}
 	folder := "sfx/"
-	s.down = mix.LoadWAV(folder + "down.wav")
-	s.horizontal = mix.LoadWAV(folder + "horizontal.wav")
-	s.rotate = mix.LoadWAV(folder + "rotate.wav")
-	s.collision = mix.LoadWAV(folder + "collision.wav")
-	s.ground = mix.LoadWAV(folder + "ground.wav")
-	s.remove = mix.LoadWAV(folder + "remove.wav")
+	s.down, _ = mix.LoadWAV(folder + "down.wav")
+	s.horizontal, _ = mix.LoadWAV(folder + "horizontal.wav")
+	s.rotate, _ = mix.LoadWAV(folder + "rotate.wav")
+	s.collision, _ = mix.LoadWAV(folder + "collision.wav")
+	s.ground, _ = mix.LoadWAV(folder + "ground.wav")
+	s.remove, _ = mix.LoadWAV(folder + "remove.wav")
 	if s.down == nil {
 		panic("unable to load sounds")
 	}
-	s.music = mix.LoadMUS(folder + "track_a.ogg")
-	if s.music != nil {
+	var err error
+	s.music, err = mix.LoadMUS(folder + "track_a.ogg")
+	if err == nil {
 		s.music.Play(-1)
 	}
 }
@@ -430,11 +431,11 @@ func (s *gameSounds) PlayDown() {
 }
 
 func (s *gameSounds) PlayHorizontal() {
-	s.horizontal.PlayChannel(-1, 0)
+	s.horizontal.Play(-1, 0)
 }
 
 func (s *gameSounds) PlayRotate() {
-	s.rotate.PlayChannel(-1, 0)
+	s.rotate.Play(-1, 0)
 }
 
 func (s *gameSounds) PlayCollision() {
@@ -442,11 +443,11 @@ func (s *gameSounds) PlayCollision() {
 }
 
 func (s *gameSounds) PlayGroundHit() {
-	s.ground.PlayChannel(-1, 0)
+	s.ground.Play(-1, 0)
 }
 
 func (s *gameSounds) PlayRemove() {
-	s.remove.PlayChannel(-1, 0)
+	s.remove.Play(-1, 0)
 }
 
 func closeAssets() {
